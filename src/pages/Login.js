@@ -1,68 +1,68 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { login } from '../services/authService';
-import { validateEmail } from '../utils/validation';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { login, getUser } from "../services/authService";
+import { validateEmail } from "../utils/validation";
 
 const Login = ({ setIsAuthenticated, setUser }) => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  
+
   const navigate = useNavigate();
 
   const { email, password } = formData;
 
-  const onChange = e => {
+  const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    
+
     // Clear error when user types
     if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: '' });
+      setErrors({ ...errors, [e.target.name]: "" });
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Validate email
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!validateEmail(email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email";
     }
-    
+
     // Validate password
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const onSubmit = async e => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
-      const data = await login({ email, password });
-      
+      await login({ email, password });
+      const userData = await getUser();
       setIsAuthenticated(true);
-      setUser(data.user);
-      
-      toast.success('Logged in successfully');
-      navigate('/dashboard');
+      setUser(userData.user);
+
+      toast.success("Logged in successfully");
+      navigate("/dashboard");
     } catch (error) {
-      toast.error(error.message || 'Invalid credentials');
+      toast.error(error.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ const Login = ({ setIsAuthenticated, setUser }) => {
           />
           {errors.email && <div className="error">{errors.email}</div>}
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="password">Password</label>
           <input
@@ -97,14 +97,17 @@ const Login = ({ setIsAuthenticated, setUser }) => {
           />
           {errors.password && <div className="error">{errors.password}</div>}
         </div>
-        
+
         <button type="submit" className="button" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-      
+
       <p className="text-center mt-3">
-        Don't have an account? <Link to="/register" className="link">Register</Link>
+        Don't have an account?{" "}
+        <Link to="/register" className="link">
+          Register
+        </Link>
       </p>
     </div>
   );
