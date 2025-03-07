@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // Set base URL
-const API_URL = "/api/auth";
+const API = process.env.REACT_APP_API_URL;
+const API_URL = `${API}/api/auth`;
 
 // Set token in headers
 const setAuthToken = (token) => {
